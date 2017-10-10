@@ -38,14 +38,16 @@ class WallTestCase(unittest.TestCase):
         wall = maze.blocks.Wall()
         self.assertEqual(None, wall.get_neighbour('cell1'))
         self.assertEqual(None, wall.get_neighbour('cell2'))
-        wall.bind('cell1', 'cell2')
+        wall.bind('cell1')
+        self.assertEqual(None, wall.get_neighbour('cell1'))
+        wall.bind('cell2')
         self.assertEqual('cell2', wall.get_neighbour('cell1'))
         self.assertEqual('cell1', wall.get_neighbour('cell2'))
 
 class CellTestCase(unittest.TestCase):
-    def test_get_neighbour(self):
+    def setUp(self):
         '''
-        Tests the following setup of cells and walls:
+        Setup all tests to work on the following setup of cells and walls:
         +------+
         |      |
         |  c2  |
@@ -56,31 +58,52 @@ class CellTestCase(unittest.TestCase):
         |      |      |
         +------+------+
         '''
-        wall1 = maze.blocks.Wall()
-        wall2 = maze.blocks.Wall()
-        cell1 = maze.blocks.Cell(north = wall1, east = wall2)
-        cell2 = maze.blocks.Cell(south = wall1)
-        cell3 = maze.blocks.Cell(west = wall2)
+        self.wall1 = maze.blocks.Wall()
+        self.wall2 = maze.blocks.Wall()
+        self.cell1 = maze.blocks.Cell(north = self.wall1, east = self.wall2)
+        self.cell2 = maze.blocks.Cell(south = self.wall1)
+        self.cell3 = maze.blocks.Cell(west = self.wall2)
+        self.assertTrue(self.cell2 == self.wall1.get_neighbour(self.cell1))
+        self.assertTrue(self.cell1 == self.wall1.get_neighbour(self.cell2))
+        self.assertTrue(self.cell1 == self.wall2.get_neighbour(self.cell3))
+        self.assertTrue(self.cell3 == self.wall2.get_neighbour(self.cell1))
 
-        self.assertTrue(cell2 == wall1.get_neighbour(cell1))
-        self.assertTrue(cell1 == wall1.get_neighbour(cell2))
-        self.assertTrue(cell1 == wall2.get_neighbour(cell3))
-        self.assertTrue(cell3 == wall2.get_neighbour(cell1))
+    def tearDown(self):
+        pass
 
-        self.assertTrue(cell2 == cell1.get_neighbour(maze.blocks.NORTH))
-        self.assertTrue(cell3 == cell1.get_neighbour(maze.blocks.EAST))
-        self.assertTrue(None == cell1.get_neighbour(maze.blocks.SOUTH))
-        self.assertTrue(None == cell1.get_neighbour(maze.blocks.WEST))
+    def test_get_neighbour(self):
+        self.assertTrue(self.cell2 == self.cell1.get_neighbour(maze.blocks.NORTH))
+        self.assertTrue(self.cell3 == self.cell1.get_neighbour(maze.blocks.EAST))
+        self.assertTrue(None == self.cell1.get_neighbour(maze.blocks.SOUTH))
+        self.assertTrue(None == self.cell1.get_neighbour(maze.blocks.WEST))
 
-        self.assertTrue(None == cell2.get_neighbour(maze.blocks.NORTH))
-        self.assertTrue(None == cell2.get_neighbour(maze.blocks.EAST))
-        self.assertTrue(cell1 == cell2.get_neighbour(maze.blocks.SOUTH))
-        self.assertTrue(None == cell2.get_neighbour(maze.blocks.WEST))
+        self.assertTrue(None == self.cell2.get_neighbour(maze.blocks.NORTH))
+        self.assertTrue(None == self.cell2.get_neighbour(maze.blocks.EAST))
+        self.assertTrue(self.cell1 == self.cell2.get_neighbour(maze.blocks.SOUTH))
+        self.assertTrue(None == self.cell2.get_neighbour(maze.blocks.WEST))
 
-        self.assertTrue(None == cell3.get_neighbour(maze.blocks.NORTH))
-        self.assertTrue(None == cell3.get_neighbour(maze.blocks.EAST))
-        self.assertTrue(None == cell3.get_neighbour(maze.blocks.SOUTH))
-        self.assertTrue(cell1 == cell3.get_neighbour(maze.blocks.WEST))
+        self.assertTrue(None == self.cell3.get_neighbour(maze.blocks.NORTH))
+        self.assertTrue(None == self.cell3.get_neighbour(maze.blocks.EAST))
+        self.assertTrue(None == self.cell3.get_neighbour(maze.blocks.SOUTH))
+        self.assertTrue(self.cell1 == self.cell3.get_neighbour(maze.blocks.WEST))
+
+    def test_get_wall(self):
+        self.wall1.is_set = True
+
+        self.assertTrue(self.cell1.get_wall(maze.blocks.NORTH))
+        self.assertFalse(self.cell1.get_wall(maze.blocks.EAST))
+        self.assertFalse(self.cell1.get_wall(maze.blocks.SOUTH))
+        self.assertFalse(self.cell1.get_wall(maze.blocks.WEST))
+
+        self.assertFalse(self.cell2.get_wall(maze.blocks.NORTH))
+        self.assertFalse(self.cell2.get_wall(maze.blocks.EAST))
+        self.assertTrue(self.cell2.get_wall(maze.blocks.SOUTH))
+        self.assertFalse(self.cell2.get_wall(maze.blocks.WEST))
+
+        self.assertFalse(self.cell3.get_wall(maze.blocks.NORTH))
+        self.assertFalse(self.cell3.get_wall(maze.blocks.EAST))
+        self.assertFalse(self.cell3.get_wall(maze.blocks.SOUTH))
+        self.assertFalse(self.cell3.get_wall(maze.blocks.WEST))
 
 if __name__ == '__main__': unittest.main()
 

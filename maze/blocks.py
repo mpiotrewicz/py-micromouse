@@ -56,3 +56,9 @@ class Cell:
         except AttributeError:
             return None
 
+    def get_wall(self, direction):
+        try:
+            return self.__walls[direction].is_set
+        except AttributeError:
+            return False
+
