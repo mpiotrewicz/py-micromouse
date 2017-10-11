@@ -33,7 +33,7 @@ class Wall:
             if len(self._adjacent_cells) < 2:
                 self._adjacent_cells.append(cell)
 
-    def get_neighbour(self, cell):
+    def adjacent(self, cell):
         if cell not in self._adjacent_cells:
             return None
         for adjacent in self._adjacent_cells:
@@ -42,23 +42,14 @@ class Wall:
 
 
 class Cell:
-    def __init__(self, north = None, east = None, south = None, west = None):
-        self.__walls = {NORTH: north, EAST: east, SOUTH: south, WEST: west}
-        for wall in self.__walls.values():
+    def __init__(self, north, east, south, west):
+        self.walls = {NORTH: north, EAST: east, SOUTH: south, WEST: west}
+        for wall in self.walls.values():
             try:
                 wall.bind(self)
             except AttributeError:
-                pass
+                raise ValueError from None
 
-    def get_neighbour(self, direction):
-        try:
-            return self.__walls[direction].get_neighbour(self)
-        except AttributeError:
-            return None
-
-    def is_wall(self, direction):
-        try:
-            return self.__walls[direction].state
-        except AttributeError:
-            return False
+    def neighbour(self, direction):
+        return self.walls[direction].adjacent(self)
 
